@@ -54,7 +54,18 @@ static inline char *_os_strcpy(char *dest, const char *src)
 }
 static inline char *_os_strncpy(char *dest, const char *src, size_t n)
 {
-	return strncpy(dest, src, n);
+	/* [W0B-S9] kernel strncpy removed in 6.8+; keep classic strncpy
+	 * semantics (copy up to n, stop at NUL, NUL-pad the remainder) so the
+	 * phl config-file parsers in hal_ld_file.c behave unchanged. */
+	size_t i = 0;
+
+	if (n == 0)
+		return dest;
+	for (; i < n && src[i] != '\0'; i++)
+		dest[i] = src[i];
+	for (; i < n; i++)
+		dest[i] = '\0';
+	return dest;
 }
 #if 1
 #define _os_strchr(s, c) strchr(s, c)
