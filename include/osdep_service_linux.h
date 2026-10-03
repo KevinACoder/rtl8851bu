@@ -724,7 +724,8 @@ struct rtw_timer_list {
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0))
 static inline void timer_hdl(struct timer_list *in_timer)
 {
-	_timer *ptimer = from_timer(ptimer, in_timer, timer);
+	/* [W0B-S6] 6.16 timer API rename: from_timer -> timer_container_of */
+	_timer *ptimer = timer_container_of(ptimer, in_timer, timer);
 
 	ptimer->function(ptimer->arg);
 }
@@ -764,12 +765,14 @@ __inline static void _set_timer(_timer *ptimer, u32 delay_time)
 
 __inline static void _cancel_timer(_timer *ptimer, u8 *bcancelled)
 {
-	*bcancelled = del_timer_sync(&ptimer->timer) == 1 ? 1 : 0;
+	/* [W0B-S6] 6.16 timer API rename: del_timer_sync -> timer_delete_sync */
+	*bcancelled = timer_delete_sync(&ptimer->timer) == 1 ? 1 : 0;
 }
 
 __inline static void _cancel_timer_async(_timer *ptimer)
 {
-	del_timer(&ptimer->timer);
+	/* [W0B-S6] 6.16 timer API rename: del_timer -> timer_delete */
+	timer_delete(&ptimer->timer);
 }
 
 /*work*/
