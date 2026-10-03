@@ -82,7 +82,6 @@ _CORE_FILES :=	core/rtw_cmd.o \
 		core/rtw_xmit_shortcut.o \
 		core/rtw_p2p.o \
 		core/rtw_tdls.o \
-		core/rtw_br_ext.o \
 		core/rtw_sreset.o \
 		core/rtw_rm.o \
 		core/rtw_rm_fsm.o \

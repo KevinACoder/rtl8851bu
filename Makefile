@@ -57,7 +57,9 @@ CONFIG_GSPI_HCI = n
 ########################## Features ###########################
 CONFIG_MP_INCLUDED = y
 CONFIG_CONCURRENT_MODE = n
-CONFIG_POWER_SAVE = y
+CONFIG_POWER_SAVE = n
+# [W0B-M3] PS off at build time (KI-027 family: default IPS/LPS wrecks TCP; wext
+# build has no nl80211 runtime power_save knob) — matches BSP GT effective state.
 CONFIG_BTC = y
 CONFIG_WAPI_SUPPORT = n
 CONFIG_EFUSE_CONFIG_FILE = y
@@ -105,7 +107,9 @@ CONFIG_RTW_EDCCA_MODE_SEL = NORMAL
 CONFIG_SIGNAL_SCALE_MAPPING = n
 CONFIG_80211W = y
 CONFIG_REDUCE_TX_CPU_LOADING = n
-CONFIG_BR_EXT = y
+CONFIG_BR_EXT = n
+# [W0B-M3] PPPoE/IPX NAT25 bridge off for STA baseline (W0L-M3 precedent); 7.3
+# kernel pppoe_hdr/pppoe_tag no longer match the driver's field accesses.
 CONFIG_TDLS = n
 CONFIG_WIFI_MONITOR = n
 CONFIG_MCC_MODE = n
@@ -812,6 +816,16 @@ $(RTKM_MODULE)-y += $(_MEMM_FILES)
 obj-$(CONFIG_RTL8851BU) += $(RTKM_MODULE).o
 endif
 endif
+
+# [W0B-M1] kbuild >= 5.16 dropped EXTRA_CFLAGS (kernel 33e0bc0ac4bf): funnel the
+# accumulated driver flags (include paths / -D macros from this Makefile and the
+# included common.mk/phl.mk/hal.mk/mac.mk) into ccflags-y, which kbuild honors.
+# Must live in the kbuild pass ($(KERNELRELEASE) set), after all flag additions.
+# NOTE: keep the cfg80211 pair from platform/i386_pc.mk — [V5] core hard-depends
+# on CONFIG_IOCTL_CFG80211 (drv_types.h:1949 wdev_data accessor is ungated;
+# rtw_wdev_priv consumers in core), so the W0-L-style wext cut is a dead end
+# here; the 7.3 compat surface is cfg80211 ops-signature modernization instead.
+ccflags-y := $(EXTRA_CFLAGS)
 
 else
 
