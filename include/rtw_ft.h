@@ -16,6 +16,10 @@
 #ifndef __RTW_FT_H_
 #define __RTW_FT_H_
 
+/* [W0B-S11] 7.x header hygiene: struct cfg80211_ft_event_params (used as a
+ * value field below) no longer arrives transitively — include directly. */
+#include <net/cfg80211.h>
+
 enum rtw_ieee80211_ft_actioncode {
 	RTW_WLAN_ACTION_FT_RESV,
 	RTW_WLAN_ACTION_FT_REQ,
